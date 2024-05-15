@@ -30,6 +30,8 @@ const PdfViewer: FC = () => {
   } | null>(() => {
     if (!startX || !startY || !endX || !endY) return null;
 
+    console.log(startX, startY);
+
     return {
       x: startX,
       y: startY,
@@ -41,7 +43,7 @@ const PdfViewer: FC = () => {
   const scale = useMemo(
     () => ({
       x: canvasSize.width / (pdfSize?.width || 1),
-      y: canvasSize.height / (pdfSize?.height || 1),
+      y: (-1 * canvasSize.height) / (pdfSize?.height || 1),
     }),
     [canvasSize, pdfSize]
   );
@@ -146,6 +148,7 @@ const PdfViewer: FC = () => {
               onMouseUp={handleMouseUp}
               onMouseMove={handleMouseMove}
               scale={scale}
+              y={canvasSize.height}
               ref={stageRef}
             >
               <Layer>
