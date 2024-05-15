@@ -22,15 +22,13 @@ const PdfViewer: FC = () => {
   const [endX, setEndX] = useState<number | null>(null);
   const [endY, setEndY] = useState<number | null>(null);
 
-  const rectDrawn = useMemo<{
+  const rectangleDrawn = useMemo<{
     x: number;
     y: number;
     width: number;
     height: number;
   } | null>(() => {
     if (!startX || !startY || !endX || !endY) return null;
-
-    console.log(startX, startY);
 
     return {
       x: startX,
@@ -66,6 +64,9 @@ const PdfViewer: FC = () => {
 
   useEffect(() => {
     const updateCanvasSize = () => {
+      // Canvas container inital size only should be determined if we have the pdfDocument loaded
+      if (!pdfDocument) return;
+
       if (canvasContainerRef.current) {
         const containerRect =
           canvasContainerRef.current.getBoundingClientRect();
@@ -87,7 +88,7 @@ const PdfViewer: FC = () => {
     return () => {
       window.removeEventListener("resize", updateCanvasSize);
     };
-  }, []);
+  }, [pdfDocument]);
 
   useEffect(() => {
     const updatePdfSize = async () => {
@@ -152,7 +153,9 @@ const PdfViewer: FC = () => {
               ref={stageRef}
             >
               <Layer>
-                {!!rectDrawn && <Rect {...rectDrawn} stroke="#4f46e5" />}
+                {!!rectangleDrawn && (
+                  <Rect {...rectangleDrawn} stroke="#4f46e5" />
+                )}
               </Layer>
             </Stage>
           )}
