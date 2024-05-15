@@ -10,6 +10,8 @@ const PdfViewer: FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const stageRef = useRef<StageType | null>(null);
 
+  const [pdfSize, setPdfSize] = useState<ICanvasSize | null>(null);
+
   const [canvasSize, setCanvasSize] = useState<ICanvasSize>(
     DEFAULT_CONTAINER_SIZE
   );
@@ -38,17 +40,26 @@ const PdfViewer: FC = () => {
 
   const scale = useMemo(
     () => ({
-      x: canvasSize.width / DEFAULT_CONTAINER_SIZE.width,
-      y: canvasSize.height / DEFAULT_CONTAINER_SIZE.height,
+      x: canvasSize.width / (pdfSize?.width || 1),
+      y: canvasSize.height / (pdfSize?.height || 1),
     }),
-    [canvasSize]
+    [canvasSize, pdfSize]
   );
 
-  const { pdfDocument } = usePdf({
+  // From url
+  /*  const { pdfDocument } = usePdf({
     file: "https://pdf-lib.js.org/assets/with_update_sections.pdf",
     page,
     canvasRef,
-    /*     scale: 2, */
+    scale: 2,
+  }); */
+
+  // Local pdf
+  const { pdfDocument } = usePdf({
+    file: "/test.pdf",
+    page,
+    canvasRef,
+    scale: 2,
   });
 
   useEffect(() => {
@@ -75,6 +86,19 @@ const PdfViewer: FC = () => {
       window.removeEventListener("resize", updateCanvasSize);
     };
   }, []);
+
+  useEffect(() => {
+    const updatePdfSize = async () => {
+      const pageData = await pdfDocument?.getPage(page);
+      const viewPort = pageData?.getViewport({ scale: 1 });
+
+      if (viewPort) {
+        setPdfSize({ width: viewPort.width, height: viewPort.height });
+      }
+    };
+
+    updatePdfSize();
+  }, [pdfDocument, page]);
 
   // Methods
   const handleMouseDown = () => {
@@ -113,20 +137,22 @@ const PdfViewer: FC = () => {
       <div ref={canvasContainerRef} className="size-full relative">
         <canvas ref={canvasRef} className="size-full" />
 
-        <div className="absolute inset-0 z-50">
-          <Stage
-            width={DEFAULT_CONTAINER_SIZE.width}
-            height={DEFAULT_CONTAINER_SIZE.height}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-            scale={scale}
-            ref={stageRef}
-          >
-            <Layer>
-              {!!rectDrawn && <Rect {...rectDrawn} stroke="#4f46e5" />}
-            </Layer>
-          </Stage>
+        <div className="absolute inset-0 z-50 w-full h-full">
+          {pdfSize && (
+            <Stage
+              width={canvasSize.width}
+              height={canvasSize.height}
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
+              onMouseMove={handleMouseMove}
+              scale={scale}
+              ref={stageRef}
+            >
+              <Layer>
+                {!!rectDrawn && <Rect {...rectDrawn} stroke="#4f46e5" />}
+              </Layer>
+            </Stage>
+          )}
         </div>
       </div>
 
