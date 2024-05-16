@@ -31,8 +31,8 @@ export interface IInputSection {
   characterStart?: number; // Több input sectionnél melyik rész kerül bele pl: adószám 2 input boxába 8-9
   characterEnd?: number;
   maxLength?: number;
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
   style: {
     fontSize: number;
     fontType: string;

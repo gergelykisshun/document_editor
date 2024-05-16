@@ -9,12 +9,13 @@ import TwButton from "./TwButton";
 import { IFormFieldDTO } from "../interfaces/document";
 
 type Props = {
+  fileUrl: string;
   mode: DrawMode;
   saveDrawing: (rect: IRectangleDrawn) => void;
   formFields: IFormFieldDTO[];
 };
 
-const PdfViewer: FC<Props> = ({ mode, saveDrawing, formFields }) => {
+const PdfViewer: FC<Props> = ({ mode, saveDrawing, formFields, fileUrl }) => {
   const [page, setPage] = useState(1);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const stageRef = useRef<StageType | null>(null);
@@ -66,7 +67,7 @@ const PdfViewer: FC<Props> = ({ mode, saveDrawing, formFields }) => {
 
   // Local pdf
   const { pdfDocument } = usePdf({
-    file: "/multiPage.pdf",
+    file: fileUrl,
     page,
     canvasRef,
     scale: 2,
@@ -197,6 +198,7 @@ const PdfViewer: FC<Props> = ({ mode, saveDrawing, formFields }) => {
                             width={section.width}
                             height={section.height}
                             stroke="#ff0000"
+                            onClick={() => console.log("Rect clicked")}
                           />
                         );
                       } else {

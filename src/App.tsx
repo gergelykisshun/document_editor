@@ -12,10 +12,13 @@ import {
   IInputSection,
   ISectionLength,
 } from "./interfaces/document";
+import { drawFieldsOnPdf } from "./utils/drawFieldsOnPdf";
 
 function App() {
   const [mode, setMode] = useState<DrawMode>(DrawMode.IDLE);
   const [documentType] = useState<IDocumentType>(MOCK_DOCUMENT);
+  const originalFileUrl = "/multiPage.pdf";
+  const [fileUrl, setFileUrl] = useState<string>(originalFileUrl);
 
   const [sections, setSections] = useState<ISectionLength[]>([]);
   const [fieldTypeForSectionSelection, setFieldTypeForSectionSelection] =
@@ -47,6 +50,17 @@ function App() {
     }
   }, [sections]);
 
+  useEffect(() => {
+    const getPdfWithFieldsDrawn = async () => {
+      const newPdfUrl = await drawFieldsOnPdf(formFields, originalFileUrl);
+      setFileUrl(newPdfUrl);
+    };
+
+    if (formFields.length > 0) {
+      getPdfWithFieldsDrawn();
+    }
+  }, [formFields]);
+
   return (
     <>
       <h1 className="text-indigo-600">{documentType.name}</h1>
@@ -60,19 +74,17 @@ function App() {
 
         <div className="col-span-5">
           <PdfViewer
+            fileUrl={fileUrl}
             mode={mode}
             saveDrawing={(rect) => {
               setFormFields((prev) => {
-                console.log("HERE1", fieldTypeForSectionSelection);
                 if (!fieldTypeForSectionSelection) return prev;
-                console.log("HERE2");
 
                 const formFieldFound = prev.find(
                   (field) =>
                     field.fieldType.id === fieldTypeForSectionSelection?.id
                 );
 
-                console.log("HERE3");
                 const newSection: IInputSection = {
                   pageNumber: rect.page,
                   xCanvasSize: rect.pdfSize.width,
@@ -89,7 +101,6 @@ function App() {
                   },
                 };
 
-                console.log("HERE");
                 if (!formFieldFound) {
                   return [
                     ...prev,
