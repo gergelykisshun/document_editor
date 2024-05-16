@@ -1,11 +1,18 @@
-import { useState, useRef, FC, useEffect, useMemo } from "react";
+import { useState, useRef, FC, useEffect, useMemo, ReactNode } from "react";
 import { usePdf } from "@mikecousins/react-pdf";
 import { Layer, Rect, Stage } from "react-konva";
 import { Stage as StageType } from "konva/lib/Stage";
 import { DEFAULT_CONTAINER_SIZE } from "../constant/drawingCanvas";
-import { ICanvasSize } from "../interfaces/drawingCanvas";
+import { ICanvasSize, IRectangleDrawn } from "../interfaces/drawingCanvas";
+import { DrawMode } from "../enums/drawingCanvas";
 
-const PdfViewer: FC = () => {
+type Props = {
+  mode: DrawMode;
+  saveDrawing: (rect: IRectangleDrawn) => void;
+  rectanglesDrawn: IRectangleDrawn[];
+};
+
+const PdfViewer: FC<Props> = ({ mode, saveDrawing, rectanglesDrawn }) => {
   const [page, setPage] = useState(1);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const stageRef = useRef<StageType | null>(null);
@@ -28,7 +35,8 @@ const PdfViewer: FC = () => {
     width: number;
     height: number;
   } | null>(() => {
-    if (!startX || !startY || !endX || !endY) return null;
+    if (mode !== DrawMode.RECT || !startX || !startY || !endX || !endY)
+      return null;
 
     return {
       x: startX,
@@ -56,7 +64,7 @@ const PdfViewer: FC = () => {
 
   // Local pdf
   const { pdfDocument } = usePdf({
-    file: "/test.pdf",
+    file: "/multiPage.pdf",
     page,
     canvasRef,
     scale: 2,
@@ -134,9 +142,31 @@ const PdfViewer: FC = () => {
     setEndX(pointerPosition.x);
     setEndY(pointerPosition.y);
   };
+  const resetDrawing = () => {
+    setStartX(null);
+    setStartY(null);
+    setEndX(null);
+    setEndY(null);
+    setIsDrawing(false);
+  };
+
+  const saveRectangle = () => {
+    if (!pdfSize || !rectangleDrawn) return;
+    saveDrawing({ ...rectangleDrawn, page, pdfSize });
+    resetDrawing();
+  };
+
+  useEffect(() => {
+    if (mode === DrawMode.IDLE) {
+      resetDrawing();
+    }
+  }, [mode]);
 
   return (
     <div>
+      {rectangleDrawn && (
+        <button onClick={saveRectangle}>Save rectangle</button>
+      )}
       <div ref={canvasContainerRef} className="size-full relative">
         <canvas ref={canvasRef} className="size-full" />
 
@@ -153,6 +183,15 @@ const PdfViewer: FC = () => {
               ref={stageRef}
             >
               <Layer>
+                {rectanglesDrawn.length > 0 &&
+                  rectanglesDrawn.map((rect, idx) => {
+                    if (rect.page === page) {
+                      return <Rect key={idx} {...rect} stroke="#ff0000" />;
+                    } else {
+                      return null;
+                    }
+                  })}
+
                 {!!rectangleDrawn && (
                   <Rect {...rectangleDrawn} stroke="#4f46e5" />
                 )}
