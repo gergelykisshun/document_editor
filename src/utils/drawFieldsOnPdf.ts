@@ -20,14 +20,20 @@ export const drawFieldsOnPdf = async (
         const page = pdfDoc.getPage(section.pageNumber - 1);
 
         // TODO letter spacing
-        page.drawText(field.fieldType.placeholder, {
-          // +3 is padding
-          x: section.xPosition + 3,
-          y: section.yPosition + section.height + 3,
-          color: rgb(0, 0, 0),
-          font: helveticaFont,
-          size: section.style.fontSize,
-        });
+        page.drawText(
+          field.fieldType.placeholder.slice(
+            section.characterStart,
+            section.characterEnd
+          ),
+          {
+            // +3 is padding
+            x: section.xPosition + 3,
+            y: section.yPosition + section.height + 3,
+            color: rgb(0, 0, 0),
+            font: helveticaFont,
+            size: section.style.fontSize,
+          }
+        );
       });
     })
   );
