@@ -1,18 +1,20 @@
-import { useState, useRef, FC, useEffect, useMemo, ReactNode } from "react";
+import { useState, useRef, FC, useEffect, useMemo } from "react";
 import { usePdf } from "@mikecousins/react-pdf";
 import { Layer, Rect, Stage } from "react-konva";
 import { Stage as StageType } from "konva/lib/Stage";
 import { DEFAULT_CONTAINER_SIZE } from "../constant/drawingCanvas";
 import { ICanvasSize, IRectangleDrawn } from "../interfaces/drawingCanvas";
 import { DrawMode } from "../enums/drawingCanvas";
+import TwButton from "./TwButton";
+import { IFormFieldDTO } from "../interfaces/document";
 
 type Props = {
   mode: DrawMode;
   saveDrawing: (rect: IRectangleDrawn) => void;
-  rectanglesDrawn: IRectangleDrawn[];
+  formFields: IFormFieldDTO[];
 };
 
-const PdfViewer: FC<Props> = ({ mode, saveDrawing, rectanglesDrawn }) => {
+const PdfViewer: FC<Props> = ({ mode, saveDrawing, formFields }) => {
   const [page, setPage] = useState(1);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const stageRef = useRef<StageType | null>(null);
@@ -165,7 +167,7 @@ const PdfViewer: FC<Props> = ({ mode, saveDrawing, rectanglesDrawn }) => {
   return (
     <div>
       {rectangleDrawn && (
-        <button onClick={saveRectangle}>Save rectangle</button>
+        <TwButton onClick={saveRectangle}>Save rectangle</TwButton>
       )}
       <div ref={canvasContainerRef} className="size-full relative">
         <canvas ref={canvasRef} className="size-full" />
@@ -183,14 +185,25 @@ const PdfViewer: FC<Props> = ({ mode, saveDrawing, rectanglesDrawn }) => {
               ref={stageRef}
             >
               <Layer>
-                {rectanglesDrawn.length > 0 &&
-                  rectanglesDrawn.map((rect, idx) => {
-                    if (rect.page === page) {
-                      return <Rect key={idx} {...rect} stroke="#ff0000" />;
-                    } else {
-                      return null;
-                    }
-                  })}
+                {formFields.length > 0 &&
+                  formFields.map((formField) =>
+                    formField.sections.map((section, idx) => {
+                      if (section.pageNumber === page) {
+                        return (
+                          <Rect
+                            key={idx}
+                            x={section.xPosition}
+                            y={section.yPosition}
+                            width={section.width}
+                            height={section.height}
+                            stroke="#ff0000"
+                          />
+                        );
+                      } else {
+                        return null;
+                      }
+                    })
+                  )}
 
                 {!!rectangleDrawn && (
                   <Rect {...rectangleDrawn} stroke="#4f46e5" />
@@ -202,23 +215,18 @@ const PdfViewer: FC<Props> = ({ mode, saveDrawing, rectanglesDrawn }) => {
       </div>
 
       {Boolean(pdfDocument && pdfDocument.numPages) && (
-        <nav>
-          <ul className="pager">
-            <li className="previous">
-              <button disabled={page === 1} onClick={() => setPage(page - 1)}>
-                Previous
-              </button>
-            </li>
-            <li className="next">
-              <button
-                disabled={page === pdfDocument?.numPages}
-                onClick={() => setPage(page + 1)}
-              >
-                Next
-              </button>
-            </li>
-          </ul>
-        </nav>
+        <div className="pager flex gap-2">
+          <TwButton disabled={page === 1} onClick={() => setPage(page - 1)}>
+            Previous
+          </TwButton>
+
+          <TwButton
+            disabled={page === pdfDocument?.numPages}
+            onClick={() => setPage(page + 1)}
+          >
+            Next
+          </TwButton>
+        </div>
       )}
     </div>
   );

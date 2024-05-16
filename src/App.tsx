@@ -8,21 +8,22 @@ import FieldTypesSelector from "./components/FieldTypesSelector";
 import {
   IDocumentType,
   IFieldType,
+  IFormFieldDTO,
+  IInputSection,
   ISectionLength,
 } from "./interfaces/document";
-import { IRectangleDrawn } from "./interfaces/drawingCanvas";
 
 function App() {
   const [mode, setMode] = useState<DrawMode>(DrawMode.IDLE);
-  const [documentType, setDocumentType] =
-    useState<IDocumentType>(MOCK_DOCUMENT);
+  const [documentType] = useState<IDocumentType>(MOCK_DOCUMENT);
 
   const [sections, setSections] = useState<ISectionLength[]>([]);
-  const [typeForSectionSelection, setTypeForSectionSelection] = useState<
-    IFieldType["type"] | null
-  >(null);
+  const [fieldTypeForSectionSelection, setFieldTypeForSectionSelection] =
+    useState<IFieldType | null>(null);
+  const [sectionSelectorOpen, setSectionSelectorOpen] =
+    useState<boolean>(false);
 
-  const [rectanglesDrawn, setRectanglesDrawn] = useState<IRectangleDrawn[]>([]);
+  const [formFields, setFormFields] = useState<IFormFieldDTO[]>([]);
 
   // Methods
   const startDrawingSections = (sections: ISectionLength[]) => {
@@ -34,8 +35,10 @@ function App() {
     if (fieldType.type === "bool" || fieldType.type === "underline") {
       startDrawingSections([{ length: 1 }]);
     } else {
-      setTypeForSectionSelection(fieldType.type);
+      // Need to select sections before proceeding
+      setSectionSelectorOpen(true);
     }
+    setFieldTypeForSectionSelection(fieldType);
   };
 
   useEffect(() => {
@@ -47,37 +50,89 @@ function App() {
   return (
     <>
       <h1 className="text-indigo-600">{documentType.name}</h1>
+      <div className="grid grid-cols-6 divide-x">
+        <div>
+          <FieldTypesSelector
+            documentType={documentType}
+            onSelect={(fieldType) => selectFieldTypeForDraw(fieldType)}
+          />
+        </div>
 
-      {/*  <h2>This is the editor</h2>
-      <PdfEditor /> */}
+        <div className="col-span-5">
+          <PdfViewer
+            mode={mode}
+            saveDrawing={(rect) => {
+              setFormFields((prev) => {
+                console.log("HERE1", fieldTypeForSectionSelection);
+                if (!fieldTypeForSectionSelection) return prev;
+                console.log("HERE2");
 
-      <FieldTypesSelector
-        documentType={documentType}
-        onSelect={(fieldType) => selectFieldTypeForDraw(fieldType)}
-      />
+                const formFieldFound = prev.find(
+                  (field) =>
+                    field.fieldType.id === fieldTypeForSectionSelection?.id
+                );
 
-      {typeForSectionSelection && (
+                console.log("HERE3");
+                const newSection: IInputSection = {
+                  pageNumber: rect.page,
+                  xCanvasSize: rect.pdfSize.width,
+                  yCanvasSize: rect.pdfSize.height,
+                  xPosition: rect.x,
+                  yPosition: rect.y,
+                  width: rect.width,
+                  height: rect.height,
+                  dateType: fieldTypeForSectionSelection.type,
+                  style: {
+                    fontSize: 12,
+                    fontType: "sans",
+                    characterSpacing: 2,
+                  },
+                };
+
+                console.log("HERE");
+                if (!formFieldFound) {
+                  return [
+                    ...prev,
+                    {
+                      documentType: documentType.id,
+                      fieldType: fieldTypeForSectionSelection,
+                      sections: [newSection],
+                    },
+                  ];
+                } else {
+                  return prev.map((field) => {
+                    if (field.fieldType.id === formFieldFound.fieldType.id) {
+                      return {
+                        ...field,
+                        sections: [...field.sections, newSection],
+                      };
+                    } else {
+                      return field;
+                    }
+                  });
+                }
+              });
+
+              setSections((prev) => {
+                const newSections = [...prev];
+                newSections.shift();
+                return newSections;
+              });
+            }}
+            formFields={formFields}
+          />
+        </div>
+      </div>
+
+      {fieldTypeForSectionSelection && (
         <SectionSelectorModal
-          isOpen={!!typeForSectionSelection}
-          handleClose={() => setTypeForSectionSelection(null)}
+          isOpen={sectionSelectorOpen}
+          handleClose={() => setSectionSelectorOpen(false)}
           onSave={(sections) => {
             startDrawingSections(sections);
           }}
         />
       )}
-
-      <PdfViewer
-        mode={mode}
-        saveDrawing={(rect) => {
-          setRectanglesDrawn((prev) => [...prev, rect]);
-          setSections((prev) => {
-            const newSections = [...prev];
-            newSections.shift();
-            return newSections;
-          });
-        }}
-        rectanglesDrawn={rectanglesDrawn}
-      />
     </>
   );
 }

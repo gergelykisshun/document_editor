@@ -1,5 +1,6 @@
 import { FC } from "react";
 import { IDocumentType, IFieldType } from "../interfaces/document";
+import TwButton from "./TwButton";
 
 type Props = {
   documentType: IDocumentType;
@@ -11,13 +12,9 @@ const FieldTypesSelector: FC<Props> = ({ documentType, onSelect }) => {
     <div className="flex flex-wrap gap-2">
       {documentType.fieldTypes.map((fieldType) => {
         return (
-          <button
-            key={fieldType.id}
-            onClick={() => onSelect(fieldType)}
-            className="border px-2 py-1 bg-indigo-600 text-white"
-          >
+          <TwButton key={fieldType.id} onClick={() => onSelect(fieldType)}>
             Add {fieldType.type} for {fieldType.name}
-          </button>
+          </TwButton>
         );
       })}
     </div>

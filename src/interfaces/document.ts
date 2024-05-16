@@ -12,12 +12,13 @@ export interface IFieldType {
   placeholder: string;
 }
 
-export interface IFormField {
-  id: number;
+export interface IFormFieldDTO {
   documentType: number;
-  type: number;
-  name: string;
+  fieldType: IFieldType;
   sections: IInputSection[];
+}
+export interface IFormField extends IFormFieldDTO {
+  id: number;
 }
 
 export interface IInputSection {
@@ -30,6 +31,8 @@ export interface IInputSection {
   characterStart?: number; // Több input sectionnél melyik rész kerül bele pl: adószám 2 input boxába 8-9
   characterEnd?: number;
   maxLength?: number;
+  width?: number;
+  height?: number;
   style: {
     fontSize: number;
     fontType: string;

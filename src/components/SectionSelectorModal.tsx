@@ -6,6 +6,7 @@ import {
 } from "@headlessui/react";
 import { FC, useState } from "react";
 import { ISectionLength } from "../interfaces/document";
+import TwButton from "./TwButton";
 
 type Props = {
   isOpen: boolean;
@@ -55,22 +56,22 @@ const SectionSelectorModal: FC<Props> = ({ handleClose, isOpen, onSave }) => {
             </div>
           ))}
 
-          <button
+          <TwButton
             onClick={() => setSections((prev) => [...prev, { length: 1 }])}
           >
             Add section
-          </button>
+          </TwButton>
 
           <div className="flex gap-4">
-            <button onClick={handleClose}>Cancel</button>
-            <button
+            <TwButton onClick={handleClose}>Cancel</TwButton>
+            <TwButton
               onClick={() => {
                 onSave(sections);
                 handleClose();
               }}
             >
               Save
-            </button>
+            </TwButton>
           </div>
         </DialogPanel>
       </div>
