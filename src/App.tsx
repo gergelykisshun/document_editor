@@ -13,6 +13,7 @@ import {
   ISectionLength,
 } from "./interfaces/document";
 import { drawFieldsOnPdf } from "./utils/drawFieldsOnPdf";
+import FormFieldsEditor from "./components/FormFieldsEditor";
 
 function App() {
   const [mode, setMode] = useState<DrawMode>(DrawMode.IDLE);
@@ -44,6 +45,14 @@ function App() {
     setFieldTypeForSectionSelection(fieldType);
   };
 
+  const handleRectSelect = (
+    formField: IFormFieldDTO,
+    section: IInputSection
+  ) => {
+    console.log(formField);
+    console.log(section);
+  };
+
   useEffect(() => {
     if (sections.length === 0) {
       setMode(DrawMode.IDLE);
@@ -69,6 +78,11 @@ function App() {
           <FieldTypesSelector
             documentType={documentType}
             onSelect={(fieldType) => selectFieldTypeForDraw(fieldType)}
+          />
+
+          <FormFieldsEditor
+            formFields={formFields}
+            setFormFields={setFormFields}
           />
         </div>
 
@@ -131,6 +145,7 @@ function App() {
               });
             }}
             formFields={formFields}
+            onRectSelected={handleRectSelect}
           />
         </div>
       </div>

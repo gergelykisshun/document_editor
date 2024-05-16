@@ -6,16 +6,23 @@ import { DEFAULT_CONTAINER_SIZE } from "../constant/drawingCanvas";
 import { ICanvasSize, IRectangleDrawn } from "../interfaces/drawingCanvas";
 import { DrawMode } from "../enums/drawingCanvas";
 import TwButton from "./TwButton";
-import { IFormFieldDTO } from "../interfaces/document";
+import { IFormFieldDTO, IInputSection } from "../interfaces/document";
 
 type Props = {
   fileUrl: string;
   mode: DrawMode;
   saveDrawing: (rect: IRectangleDrawn) => void;
   formFields: IFormFieldDTO[];
+  onRectSelected: (formField: IFormFieldDTO, section: IInputSection) => void;
 };
 
-const PdfViewer: FC<Props> = ({ mode, saveDrawing, formFields, fileUrl }) => {
+const PdfViewer: FC<Props> = ({
+  mode,
+  saveDrawing,
+  formFields,
+  fileUrl,
+  onRectSelected,
+}) => {
   const [page, setPage] = useState(1);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const stageRef = useRef<StageType | null>(null);
@@ -198,7 +205,7 @@ const PdfViewer: FC<Props> = ({ mode, saveDrawing, formFields, fileUrl }) => {
                             width={section.width}
                             height={section.height}
                             stroke="#ff0000"
-                            onClick={() => console.log("Rect clicked")}
+                            onClick={() => onRectSelected(formField, section)}
                           />
                         );
                       } else {
