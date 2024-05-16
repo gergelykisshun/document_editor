@@ -40,6 +40,7 @@ export interface IInputSection {
   };
 }
 
-export interface ISectionLength {
-  length: number;
+export interface ISectionProps {
+  start: number;
+  end: number;
 }

@@ -10,7 +10,7 @@ import {
   IFieldType,
   IFormFieldDTO,
   IInputSection,
-  ISectionLength,
+  ISectionProps,
 } from "./interfaces/document";
 import { drawFieldsOnPdf } from "./utils/drawFieldsOnPdf";
 import FormFieldsEditor from "./components/FormFieldsEditor";
@@ -21,7 +21,7 @@ function App() {
   const originalFileUrl = "/multiPage.pdf";
   const [fileUrl, setFileUrl] = useState<string>(originalFileUrl);
 
-  const [sections, setSections] = useState<ISectionLength[]>([]);
+  const [sections, setSections] = useState<ISectionProps[]>([]);
   const [fieldTypeForSectionSelection, setFieldTypeForSectionSelection] =
     useState<IFieldType | null>(null);
   const [sectionSelectorOpen, setSectionSelectorOpen] =
@@ -30,14 +30,14 @@ function App() {
   const [formFields, setFormFields] = useState<IFormFieldDTO[]>([]);
 
   // Methods
-  const startDrawingSections = (sections: ISectionLength[]) => {
+  const startDrawingSections = (sections: ISectionProps[]) => {
     setSections(sections);
     setMode(DrawMode.RECT);
   };
 
   const selectFieldTypeForDraw = (fieldType: IFieldType) => {
     if (fieldType.type === "bool" || fieldType.type === "underline") {
-      startDrawingSections([{ length: 1 }]);
+      startDrawingSections([{ start: 0, end: 1 }]);
     } else {
       // Need to select sections before proceeding
       setSectionSelectorOpen(true);
@@ -108,6 +108,8 @@ function App() {
                   width: rect.width,
                   height: rect.height,
                   dateType: fieldTypeForSectionSelection.type,
+                  characterStart: sections[0].start,
+                  characterEnd: sections[0].end,
                   style: {
                     fontSize: 12,
                     fontType: "sans",

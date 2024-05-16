@@ -5,17 +5,19 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import { FC, useState } from "react";
-import { ISectionLength } from "../interfaces/document";
+import { ISectionProps } from "../interfaces/document";
 import TwButton from "./TwButton";
 
 type Props = {
   isOpen: boolean;
   handleClose: () => void;
-  onSave: (sections: ISectionLength[]) => void;
+  onSave: (sections: ISectionProps[]) => void;
 };
 
 const SectionSelectorModal: FC<Props> = ({ handleClose, isOpen, onSave }) => {
-  const [sections, setSections] = useState<ISectionLength[]>([{ length: 5 }]);
+  const [sections, setSections] = useState<ISectionProps[]>([
+    { start: 0, end: 1 },
+  ]);
 
   return (
     <Dialog
@@ -34,30 +36,61 @@ const SectionSelectorModal: FC<Props> = ({ handleClose, isOpen, onSave }) => {
 
           {sections.map((section, i) => (
             <div key={i}>
-              <input
-                type="number"
-                min={0}
-                step={1}
-                value={section.length}
-                onChange={(e) => {
-                  const value = e.target.value;
+              <h1 className="underline">Section {i + 1}</h1>
+              <div className="flex items-center gap-2">
+                <h2>Start char:</h2>
+                <input
+                  className="flex-1"
+                  type="number"
+                  min={0}
+                  step={1}
+                  value={section.start}
+                  onChange={(e) => {
+                    const value = e.target.value;
 
-                  setSections((prev) =>
-                    prev.map((section, idx) => {
-                      if (idx === i) {
-                        return { length: Number(value) };
-                      } else {
-                        return section;
-                      }
-                    })
-                  );
-                }}
-              />
+                    setSections((prev) =>
+                      prev.map((section, idx) => {
+                        if (idx === i) {
+                          return { ...section, start: Number(value) };
+                        } else {
+                          return section;
+                        }
+                      })
+                    );
+                  }}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <h2>End char:</h2>
+                <input
+                  className="flex-1"
+                  type="number"
+                  min={0}
+                  step={1}
+                  value={section.end}
+                  onChange={(e) => {
+                    const value = e.target.value;
+
+                    setSections((prev) =>
+                      prev.map((section, idx) => {
+                        if (idx === i) {
+                          return { ...section, end: Number(value) };
+                        } else {
+                          return section;
+                        }
+                      })
+                    );
+                  }}
+                />
+              </div>
             </div>
           ))}
 
           <TwButton
-            onClick={() => setSections((prev) => [...prev, { length: 1 }])}
+            onClick={() =>
+              setSections((prev) => [...prev, { start: 0, end: 1 }])
+            }
           >
             Add section
           </TwButton>
