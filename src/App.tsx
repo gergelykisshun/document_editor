@@ -110,7 +110,7 @@ function App() {
                   style: {
                     fontSize: 12,
                     fontType: "helvetica",
-                    characterSpacing: 2,
+                    characterSpacing: 10,
                   },
                 };
 

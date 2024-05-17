@@ -19,23 +19,22 @@ export const drawFieldsOnPdf = async (
 
         const page = pdfDoc.getPage(section.pageNumber - 1);
 
-        // TODO letter spacing
-        page.drawText(
-          field.fieldType.placeholder.slice(
-            section.characterStart,
-            section.characterEnd
-          ),
-          {
-            x: section.boundingBox.xPosition + section.boundingBox.paddingX,
+        let curX = section.boundingBox.xPosition + section.boundingBox.paddingX;
+        for (const char of field.fieldType.placeholder) {
+          page.drawText(char, {
+            x: curX,
             y:
               section.boundingBox.yPosition +
               section.boundingBox.height +
               section.boundingBox.paddingY,
-            color: rgb(0, 0, 0),
             font: helveticaFont,
             size: section.style.fontSize,
-          }
-        );
+            color: rgb(0, 0, 0),
+          });
+          curX +=
+            helveticaFont.widthOfTextAtSize(char, section.style.fontSize) +
+            section.style.characterSpacing;
+        }
       });
     })
   );
