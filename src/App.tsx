@@ -103,8 +103,6 @@ function App() {
                   pageNumber: rect.page,
                   xCanvasSize: rect.pdfSize.width,
                   yCanvasSize: rect.pdfSize.height,
-                  xPosition: rect.x,
-                  yPosition: rect.y,
                   boundingBox: rect.boundingBox,
                   dateType: fieldTypeForSectionSelection.type,
                   characterStart: sections[0].start,

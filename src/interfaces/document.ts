@@ -23,10 +23,6 @@ export interface IFormField extends IFormFieldDTO {
 
 export interface IInputSection {
   pageNumber: number;
-  // For text
-  xPosition: number; // StartY
-  yPosition: number; // EndY
-  // For rectangle box
   boundingBox: IInputSectionBBox;
   xCanvasSize: number; // Mekkora canvasen vettem fel
   yCanvasSize: number;
@@ -46,7 +42,8 @@ export interface IInputSectionBBox {
   yPosition: number; // StartY
   width: number;
   height: number;
-  padding: number;
+  paddingX: number;
+  paddingY: number;
 }
 
 export interface ISectionProps {

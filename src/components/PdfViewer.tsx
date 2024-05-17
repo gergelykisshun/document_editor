@@ -161,16 +161,15 @@ const PdfViewer: FC<Props> = ({
   };
 
   const saveRectangle = () => {
-    if (!pdfSize || !rectangleDrawn || !startX || !endY) return;
+    if (!pdfSize || !rectangleDrawn) return;
     saveDrawing({
-      x: startX,
-      y: endY,
       boundingBox: {
         xPosition: rectangleDrawn.x,
         yPosition: rectangleDrawn.y,
         height: rectangleDrawn.height,
         width: rectangleDrawn.width,
-        padding: 0,
+        paddingX: 3,
+        paddingY: 3,
       },
       page,
       pdfSize,

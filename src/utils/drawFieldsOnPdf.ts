@@ -26,8 +26,11 @@ export const drawFieldsOnPdf = async (
             section.characterEnd
           ),
           {
-            x: section.xPosition + section.boundingBox.padding,
-            y: section.yPosition + section.boundingBox.padding,
+            x: section.boundingBox.xPosition + section.boundingBox.paddingX,
+            y:
+              section.boundingBox.yPosition +
+              section.boundingBox.height +
+              section.boundingBox.paddingY,
             color: rgb(0, 0, 0),
             font: helveticaFont,
             size: section.style.fontSize,
