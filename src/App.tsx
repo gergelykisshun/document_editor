@@ -15,6 +15,7 @@ import {
 import FormFieldsEditor from "./components/FormFieldsEditor";
 import { DEFAULT_SECTION_STYLE } from "./constant/sections";
 import { calcFontHeight } from "./utils/calcFontHeight";
+import TwButton from "./components/TwButton";
 
 function App() {
   const [mode, setMode] = useState<DrawMode>(DrawMode.IDLE);
@@ -56,6 +57,23 @@ function App() {
     console.log(section);
   };
 
+  const handleSubmit = () => {
+    // TODO think this part through
+    const cleanFields: IDocumentType["fields"] = formFields.map((field) => {
+      return {
+        ...field,
+        id: Math.random(),
+        sections: field.sections.map((section) => {
+          delete section.style.fontHeight;
+          return section;
+        }),
+      };
+    });
+
+    const doc: IDocumentType = { ...documentType, fields: cleanFields };
+    console.log(JSON.stringify(doc));
+  };
+
   useEffect(() => {
     if (sections.length === 0) {
       setMode(DrawMode.IDLE);
@@ -76,6 +94,10 @@ function App() {
             formFields={formFields}
             setFormFields={setFormFields}
           />
+
+          {formFields.length > 0 && (
+            <TwButton onClick={handleSubmit}>Submit</TwButton>
+          )}
         </div>
 
         <div className="col-span-5">

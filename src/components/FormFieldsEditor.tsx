@@ -40,6 +40,7 @@ const FormFieldsEditor: FC<Props> = ({ formFields, setFormFields }) => {
           <h2>{field.fieldType.name}</h2>
           {field.sections.map((section, sectionIdx) => (
             <SectionEditorForm
+              key={sectionIdx}
               section={section}
               i={sectionIdx}
               onSectionChange={(i, section) =>
