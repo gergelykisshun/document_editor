@@ -12,14 +12,16 @@ import {
   IInputSection,
   ISectionProps,
 } from "./interfaces/document";
-import { drawFieldsOnPdf } from "./utils/drawFieldsOnPdf";
 import FormFieldsEditor from "./components/FormFieldsEditor";
+import { PDFDocument, StandardFonts } from "pdf-lib";
 
 function App() {
   const [mode, setMode] = useState<DrawMode>(DrawMode.IDLE);
   const [documentType] = useState<IDocumentType>(MOCK_DOCUMENT);
+
+  // This will be fetched and stored in the state var
   const originalFileUrl = "/multiPage.pdf";
-  const [fileUrl, setFileUrl] = useState<string>(originalFileUrl);
+  const [fileUrl] = useState<string>(originalFileUrl);
 
   const [sections, setSections] = useState<ISectionProps[]>([]);
   const [fieldTypeForSectionSelection, setFieldTypeForSectionSelection] =
@@ -59,17 +61,6 @@ function App() {
     }
   }, [sections]);
 
-  useEffect(() => {
-    const getPdfWithFieldsDrawn = async () => {
-      const newPdfUrl = await drawFieldsOnPdf(formFields, originalFileUrl);
-      setFileUrl(newPdfUrl);
-    };
-
-    if (formFields.length > 0) {
-      getPdfWithFieldsDrawn();
-    }
-  }, [formFields]);
-
   return (
     <>
       <h1 className="text-indigo-600">{documentType.name}</h1>
@@ -90,7 +81,16 @@ function App() {
           <PdfViewer
             fileUrl={fileUrl}
             mode={mode}
-            saveDrawing={(rect) => {
+            saveDrawing={async (rect) => {
+              // This is going to be from section 0
+              // TODO test here
+              const fontStyle = StandardFonts.Helvetica;
+              const fontSize = 35;
+              const letterSpacing = 1;
+              const tempDoc = await PDFDocument.create();
+              const font = await tempDoc.embedFont(fontStyle);
+              const fontHeight = font.heightAtSize(fontSize);
+
               setFormFields((prev) => {
                 if (!fieldTypeForSectionSelection) return prev;
 
@@ -108,9 +108,10 @@ function App() {
                   characterStart: sections[0].start,
                   characterEnd: sections[0].end,
                   style: {
-                    fontSize: 12,
-                    fontType: "helvetica",
-                    characterSpacing: 10,
+                    fontSize: fontSize,
+                    fontType: fontStyle,
+                    characterSpacing: letterSpacing,
+                    fontHeight,
                   },
                 };
 

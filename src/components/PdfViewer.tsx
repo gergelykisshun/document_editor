@@ -1,6 +1,6 @@
 import { useState, useRef, FC, useEffect, useMemo } from "react";
 import { usePdf } from "@mikecousins/react-pdf";
-import { Layer, Rect, Stage } from "react-konva";
+import { Group, Layer, Rect, Stage, Text } from "react-konva";
 import { Stage as StageType } from "konva/lib/Stage";
 import { DEFAULT_CONTAINER_SIZE } from "../constant/drawingCanvas";
 import { ICanvasSize, IRectangleDrawn } from "../interfaces/drawingCanvas";
@@ -209,15 +209,37 @@ const PdfViewer: FC<Props> = ({
                     formField.sections.map((section, idx) => {
                       if (section.pageNumber === page) {
                         return (
-                          <Rect
-                            key={idx}
-                            x={section.boundingBox.xPosition}
-                            y={section.boundingBox.yPosition}
-                            width={section.boundingBox.width}
-                            height={section.boundingBox.height}
-                            stroke="#ff0000"
-                            onClick={() => onRectSelected(formField, section)}
-                          />
+                          <Group key={idx}>
+                            <Rect
+                              x={section.boundingBox.xPosition}
+                              y={section.boundingBox.yPosition}
+                              width={section.boundingBox.width}
+                              height={section.boundingBox.height}
+                              stroke="#ff0000"
+                              onClick={() => onRectSelected(formField, section)}
+                            />
+                            <Text
+                              x={
+                                section.boundingBox.xPosition +
+                                section.boundingBox.paddingX
+                              }
+                              y={
+                                section.boundingBox.yPosition +
+                                section.boundingBox.height +
+                                section.boundingBox.paddingY +
+                                (section.style.fontHeight || 0)
+                              }
+                              fill="#000"
+                              text={formField.fieldType.placeholder.slice(
+                                section.characterStart,
+                                section.characterEnd
+                              )}
+                              letterSpacing={section.style.characterSpacing}
+                              fontSize={section.style.fontSize}
+                              fontFamily={section.style.fontType}
+                              scaleY={-1}
+                            />
+                          </Group>
                         );
                       } else {
                         return null;

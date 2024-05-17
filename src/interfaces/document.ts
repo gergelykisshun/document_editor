@@ -34,6 +34,8 @@ export interface IInputSection {
     fontSize: number;
     fontType: string;
     characterSpacing: number;
+    // FE only
+    fontHeight?: number;
   };
 }
 
