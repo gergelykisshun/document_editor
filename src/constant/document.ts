@@ -1,3 +1,5 @@
+import { IDocumentType } from "../interfaces/document";
+
 export const MOCK_DOCUMENT: IDocumentType = {
   id: 1,
   name: "Mock document 1",

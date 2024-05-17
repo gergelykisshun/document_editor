@@ -23,21 +23,30 @@ export interface IFormField extends IFormFieldDTO {
 
 export interface IInputSection {
   pageNumber: number;
-  xPosition: number; // X
-  yPosition: number; // Y pozíció
+  // For text
+  xPosition: number; // StartY
+  yPosition: number; // EndY
+  // For rectangle box
+  boundingBox: IInputSectionBBox;
   xCanvasSize: number; // Mekkora canvasen vettem fel
   yCanvasSize: number;
   dateType?: string; // Dátumnl (év | hónap | nap)
   characterStart?: number; // Több input sectionnél melyik rész kerül bele pl: adószám 2 input boxába 8-9
   characterEnd?: number;
   maxLength?: number;
-  width: number;
-  height: number;
   style: {
     fontSize: number;
     fontType: string;
     characterSpacing: number;
   };
+}
+
+export interface IInputSectionBBox {
+  xPosition: number; // StartX
+  yPosition: number; // StartY
+  width: number;
+  height: number;
+  padding: number;
 }
 
 export interface ISectionProps {

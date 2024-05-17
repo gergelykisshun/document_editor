@@ -6,6 +6,8 @@ type Props = {
   setFormFields: React.Dispatch<React.SetStateAction<IFormFieldDTO[]>>;
 };
 
+/* TODO This component should be a universal editor which can be put in the SectionSelectorModal.tsx aswell */
+
 const FormFieldsEditor: FC<Props> = ({ formFields, setFormFields }) => {
   return (
     <div>

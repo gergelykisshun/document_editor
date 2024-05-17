@@ -1,0 +1,5 @@
+- Avoid flickering when drawing values.
+  - Just draw on an empty pdf canvas the same size??
+  - Use react konva to draw?
+
+- Save bounding box position, text position

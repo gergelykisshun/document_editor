@@ -161,8 +161,20 @@ const PdfViewer: FC<Props> = ({
   };
 
   const saveRectangle = () => {
-    if (!pdfSize || !rectangleDrawn) return;
-    saveDrawing({ ...rectangleDrawn, page, pdfSize });
+    if (!pdfSize || !rectangleDrawn || !startX || !endY) return;
+    saveDrawing({
+      x: startX,
+      y: endY,
+      boundingBox: {
+        xPosition: rectangleDrawn.x,
+        yPosition: rectangleDrawn.y,
+        height: rectangleDrawn.height,
+        width: rectangleDrawn.width,
+        padding: 0,
+      },
+      page,
+      pdfSize,
+    });
     resetDrawing();
   };
 
@@ -200,10 +212,10 @@ const PdfViewer: FC<Props> = ({
                         return (
                           <Rect
                             key={idx}
-                            x={section.xPosition}
-                            y={section.yPosition}
-                            width={section.width}
-                            height={section.height}
+                            x={section.boundingBox.xPosition}
+                            y={section.boundingBox.yPosition}
+                            width={section.boundingBox.width}
+                            height={section.boundingBox.height}
                             stroke="#ff0000"
                             onClick={() => onRectSelected(formField, section)}
                           />

@@ -105,14 +105,13 @@ function App() {
                   yCanvasSize: rect.pdfSize.height,
                   xPosition: rect.x,
                   yPosition: rect.y,
-                  width: rect.width,
-                  height: rect.height,
+                  boundingBox: rect.boundingBox,
                   dateType: fieldTypeForSectionSelection.type,
                   characterStart: sections[0].start,
                   characterEnd: sections[0].end,
                   style: {
                     fontSize: 12,
-                    fontType: "sans",
+                    fontType: "helvetica",
                     characterSpacing: 2,
                   },
                 };
