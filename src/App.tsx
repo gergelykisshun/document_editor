@@ -10,10 +10,11 @@ import {
   IFieldType,
   IFormFieldDTO,
   IInputSection,
-  ISectionProps,
+  ISectionStyleProps,
 } from "./interfaces/document";
 import FormFieldsEditor from "./components/FormFieldsEditor";
-import { PDFDocument, StandardFonts } from "pdf-lib";
+import { DEFAULT_SECTION_STYLE } from "./constant/sections";
+import { calcFontHeight } from "./utils/calcFontHeight";
 
 function App() {
   const [mode, setMode] = useState<DrawMode>(DrawMode.IDLE);
@@ -23,7 +24,7 @@ function App() {
   const originalFileUrl = "/multiPage.pdf";
   const [fileUrl] = useState<string>(originalFileUrl);
 
-  const [sections, setSections] = useState<ISectionProps[]>([]);
+  const [sections, setSections] = useState<ISectionStyleProps[]>([]);
   const [fieldTypeForSectionSelection, setFieldTypeForSectionSelection] =
     useState<IFieldType | null>(null);
   const [sectionSelectorOpen, setSectionSelectorOpen] =
@@ -32,14 +33,14 @@ function App() {
   const [formFields, setFormFields] = useState<IFormFieldDTO[]>([]);
 
   // Methods
-  const startDrawingSections = (sections: ISectionProps[]) => {
+  const startDrawingSections = (sections: ISectionStyleProps[]) => {
     setSections(sections);
     setMode(DrawMode.RECT);
   };
 
   const selectFieldTypeForDraw = (fieldType: IFieldType) => {
     if (fieldType.type === "bool" || fieldType.type === "underline") {
-      startDrawingSections([{ start: 0, end: 1 }]);
+      startDrawingSections([DEFAULT_SECTION_STYLE]);
     } else {
       // Need to select sections before proceeding
       setSectionSelectorOpen(true);
@@ -62,7 +63,7 @@ function App() {
   }, [sections]);
 
   return (
-    <>
+    <div className="px-4">
       <h1 className="text-indigo-600">{documentType.name}</h1>
       <div className="grid grid-cols-6 divide-x">
         <div>
@@ -82,14 +83,14 @@ function App() {
             fileUrl={fileUrl}
             mode={mode}
             saveDrawing={async (rect) => {
-              // This is going to be from section 0
-              // TODO test here
-              const fontStyle = StandardFonts.Helvetica;
-              const fontSize = 35;
-              const letterSpacing = 1;
-              const tempDoc = await PDFDocument.create();
-              const font = await tempDoc.embedFont(fontStyle);
-              const fontHeight = font.heightAtSize(fontSize);
+              if (sections.length === 0) return;
+
+              const { style, characterEnd, characterStart } = sections[0];
+
+              const fontHeight = await calcFontHeight({
+                fontSize: style.fontSize,
+                fontType: style.fontType,
+              });
 
               setFormFields((prev) => {
                 if (!fieldTypeForSectionSelection) return prev;
@@ -105,12 +106,10 @@ function App() {
                   yCanvasSize: rect.pdfSize.height,
                   boundingBox: rect.boundingBox,
                   dateType: fieldTypeForSectionSelection.type,
-                  characterStart: sections[0].start,
-                  characterEnd: sections[0].end,
+                  characterStart,
+                  characterEnd,
                   style: {
-                    fontSize: fontSize,
-                    fontType: fontStyle,
-                    characterSpacing: letterSpacing,
+                    ...style,
                     fontHeight,
                   },
                 };
@@ -159,7 +158,7 @@ function App() {
           }}
         />
       )}
-    </>
+    </div>
   );
 }
 
