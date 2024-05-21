@@ -8,6 +8,7 @@ import FieldTypesSelector from "./components/FieldTypesSelector";
 import {
   IDocumentType,
   IFieldType,
+  IFormFieldChangeProps,
   IFormFieldDTO,
   IInputSection,
   ISectionStyleProps,
@@ -57,6 +58,31 @@ function App() {
     console.log(section);
   };
 
+  const handleFormfieldChange = ({
+    fieldIdx,
+    sectionIdx,
+    sectionStyle,
+  }: IFormFieldChangeProps) => {
+    setFormFields((fields) =>
+      fields.map((prevF, prevFIdx) => {
+        if (fieldIdx === prevFIdx) {
+          return {
+            ...prevF,
+            sections: prevF.sections.map((prevS, prevSIdx) => {
+              if (prevSIdx === sectionIdx) {
+                return { ...prevS, ...sectionStyle };
+              } else {
+                return prevS;
+              }
+            }),
+          };
+        } else {
+          return prevF;
+        }
+      })
+    );
+  };
+
   const handleSubmit = () => {
     // TODO think this part through
     const cleanFields: IDocumentType["fields"] = formFields.map(
@@ -104,7 +130,7 @@ function App() {
 
           <FormFieldsEditor
             formFields={formFields}
-            setFormFields={setFormFields}
+            onFormFieldChange={handleFormfieldChange}
           />
 
           {formFields.length > 0 && (
@@ -137,9 +163,7 @@ function App() {
                   dateType: fieldTypeForSectionSelection.type,
                   characterStart,
                   characterEnd,
-                  style: {
-                    ...style,
-                  },
+                  style,
                 };
 
                 if (!formFieldFound) {

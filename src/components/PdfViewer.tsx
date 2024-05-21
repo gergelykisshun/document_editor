@@ -54,7 +54,7 @@ const PdfViewer: FC<Props> = ({
       width: endX - startX,
       height: endY - startY,
     };
-  }, [startX, startY, endX, endY]);
+  }, [startX, startY, endX, endY, mode]);
 
   const scale = useMemo(
     () => ({

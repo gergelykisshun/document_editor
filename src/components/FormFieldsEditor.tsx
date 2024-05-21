@@ -1,38 +1,13 @@
 import { FC } from "react";
-import { IFormFieldDTO, ISectionStyleProps } from "../interfaces/document";
+import { IFormFieldChangeProps, IFormFieldDTO } from "../interfaces/document";
 import SectionEditorForm from "./SectionEditorForm";
 
 type Props = {
   formFields: IFormFieldDTO[];
-  setFormFields: React.Dispatch<React.SetStateAction<IFormFieldDTO[]>>;
+  onFormFieldChange: (props: IFormFieldChangeProps) => void;
 };
 
-const FormFieldsEditor: FC<Props> = ({ formFields, setFormFields }) => {
-  const handleSectionChange = (
-    sectionIdx: number,
-    newSectionStyle: ISectionStyleProps,
-    fieldIdx: number
-  ) => {
-    setFormFields((fields) =>
-      fields.map((prevF, prevFIdx) => {
-        if (fieldIdx === prevFIdx) {
-          return {
-            ...prevF,
-            sections: prevF.sections.map((prevS, prevSIdx) => {
-              if (prevSIdx === sectionIdx) {
-                return { ...prevS, ...newSectionStyle };
-              } else {
-                return prevS;
-              }
-            }),
-          };
-        } else {
-          return prevF;
-        }
-      })
-    );
-  };
-
+const FormFieldsEditor: FC<Props> = ({ formFields, onFormFieldChange }) => {
   return (
     <div>
       {formFields.map((field, fieldIdx) => (
@@ -43,8 +18,8 @@ const FormFieldsEditor: FC<Props> = ({ formFields, setFormFields }) => {
               key={sectionIdx}
               section={section}
               i={sectionIdx}
-              onSectionChange={(i, section) =>
-                handleSectionChange(i, section, fieldIdx)
+              onSectionChange={(sectionIdx, sectionStyle) =>
+                onFormFieldChange({ sectionIdx, sectionStyle, fieldIdx })
               }
             />
           ))}

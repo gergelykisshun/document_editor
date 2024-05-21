@@ -50,3 +50,9 @@ export interface ISectionStyleProps {
     characterSpacing: number;
   };
 }
+
+export interface IFormFieldChangeProps {
+  fieldIdx: number;
+  sectionIdx: number;
+  sectionStyle: ISectionStyleProps;
+}
