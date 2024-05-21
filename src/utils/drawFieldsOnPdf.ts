@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
 import { IFormFieldDTO } from "../interfaces/document";
 
 export const drawFieldsOnPdf = async (
@@ -9,14 +9,14 @@ export const drawFieldsOnPdf = async (
   const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
 
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
-  // Load font
-  const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
   await Promise.all(
     formFields.map(async (field) => {
       // Using map to support async operation
       field.sections.map(async (section) => {
         const page = pdfDoc.getPage(section.pageNumber - 1);
+        // Load font
+        const font = await pdfDoc.embedFont(section.style.fontType);
 
         let curX = section.boundingBox.xPosition + section.boundingBox.paddingX;
         for (const char of field.fieldType.placeholder.slice(
@@ -29,12 +29,12 @@ export const drawFieldsOnPdf = async (
               section.boundingBox.yPosition +
               section.boundingBox.height +
               section.boundingBox.paddingY,
-            font: helveticaFont,
+            font,
             size: section.style.fontSize,
             color: rgb(0, 0, 0),
           });
           curX +=
-            helveticaFont.widthOfTextAtSize(char, section.style.fontSize) +
+            font.widthOfTextAtSize(char, section.style.fontSize) +
             section.style.characterSpacing;
         }
       });
