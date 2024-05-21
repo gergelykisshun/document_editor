@@ -4,9 +4,6 @@ dependencies:
   '@headlessui/react':
     specifier: ^2.0.3
     version: 2.0.3(react-dom@18.2.0)(react@18.2.0)
-  '@mikecousins/react-pdf':
-    specifier: ^7.0.4
-    version: 7.0.4(pdfjs-dist@4.2.67)(react-dom@18.2.0)(react@18.2.0)
   konva:
     specifier: ^9.3.6
     version: 9.3.6
@@ -703,19 +700,6 @@ packages:
       - supports-color
     dev: false
     optional: true
-
-  /@mikecousins/react-pdf@7.0.4(pdfjs-dist@4.2.67)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-1PaAIMraiAPfB26RGNI0woqDLt5S9I24Ks1nJky6XqptYsz9Rce08WMwLFlMfmdxUTFJGxo6VuK6V0VtxxW1Bg==}
-    peerDependencies:
-      pdfjs-dist: 4.0.379
-      react: ^18.2.0
-      react-dom: ^18.2.0
-    dependencies:
-      pdfjs-dist: 4.2.67
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-    dev: false
-    bundledDependencies: []
 
   /@nodelib/fs.scandir@2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}

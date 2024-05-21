@@ -1,5 +1,4 @@
 import { useState, useRef, FC, useEffect, useMemo } from "react";
-import { usePdf } from "@mikecousins/react-pdf";
 import { Layer, Rect, Stage } from "react-konva";
 import { Stage as StageType } from "konva/lib/Stage";
 import { DEFAULT_CONTAINER_SIZE } from "../constant/drawingCanvas";
@@ -7,6 +6,7 @@ import { ICanvasSize, IRectangleDrawn } from "../interfaces/drawingCanvas";
 import { DrawMode } from "../enums/drawingCanvas";
 import TwButton from "./TwButton";
 import { IFormFieldDTO, IInputSection } from "../interfaces/document";
+import { usePdf } from "../hooks/usePdf";
 
 type Props = {
   fileUrl: string;

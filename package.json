@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.0.3",
-    "@mikecousins/react-pdf": "^7.0.4",
     "konva": "^9.3.6",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.2.67",
