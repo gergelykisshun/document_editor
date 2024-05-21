@@ -79,7 +79,7 @@ const SectionEditorForm: FC<Props> = ({ i, onSectionChange, section }) => {
           className="flex-1"
           type="number"
           min={0}
-          step={1}
+          step={0.1}
           value={section.style.characterSpacing}
           onChange={(e) => {
             const value = e.target.value;

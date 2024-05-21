@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import PdfViewer from "./components/PdfViewer";
 import "./style/index.css";
 import { DrawMode } from "./enums/drawingCanvas";
-import { MOCK_DOCUMENT } from "./constant/document";
+import { MOCK_DOCUMENT_SINGLE_PAGE } from "./constant/document";
 import SectionSelectorModal from "./components/SectionSelectorModal";
 import FieldTypesSelector from "./components/FieldTypesSelector";
 import {
@@ -19,10 +19,10 @@ import TwButton from "./components/TwButton";
 
 function App() {
   const [mode, setMode] = useState<DrawMode>(DrawMode.IDLE);
-  const [documentType] = useState<IDocumentType>(MOCK_DOCUMENT);
+  const [documentType] = useState<IDocumentType>(MOCK_DOCUMENT_SINGLE_PAGE);
 
   // This will be fetched and stored in the state var
-  const originalFileUrl = "/multiPage.pdf";
+  const originalFileUrl = "/test.pdf";
   const [fileUrl] = useState<string>(originalFileUrl);
 
   const [sections, setSections] = useState<ISectionStyleProps[]>([]);
