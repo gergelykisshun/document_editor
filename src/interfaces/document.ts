@@ -1,3 +1,5 @@
+import { StandardFonts } from "pdf-lib";
+
 export interface IDocumentType {
   id: number;
   name: string; // pl. Első házasok
@@ -21,20 +23,12 @@ export interface IFormField extends IFormFieldDTO {
   id: number;
 }
 
-export interface IInputSection {
+export interface IInputSection extends ISectionStyleProps {
   pageNumber: number;
   boundingBox: IInputSectionBBox;
   xCanvasSize: number; // Mekkora canvasen vettem fel
   yCanvasSize: number;
   dateType?: string; // Dátumnl (év | hónap | nap)
-  characterStart?: number; // Több input sectionnél melyik rész kerül bele pl: adószám 2 input boxába 8-9
-  characterEnd?: number;
-  maxLength?: number;
-  style: {
-    fontSize: number;
-    fontType: string;
-    characterSpacing: number;
-  };
 }
 
 export interface IInputSectionBBox {
@@ -46,7 +40,13 @@ export interface IInputSectionBBox {
   paddingY: number;
 }
 
-export interface ISectionProps {
-  start: number;
-  end: number;
+export interface ISectionStyleProps {
+  characterStart?: number; // Több input sectionnél melyik rész kerül bele pl: adószám 2 input boxába 8-9
+  characterEnd?: number;
+  maxLength?: number;
+  style: {
+    fontSize: number;
+    fontType: StandardFonts;
+    characterSpacing: number;
+  };
 }

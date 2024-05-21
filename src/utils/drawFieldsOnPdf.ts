@@ -9,18 +9,20 @@ export const drawFieldsOnPdf = async (
   const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
 
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
+  // Load font
+  const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
   await Promise.all(
     formFields.map(async (field) => {
       // Using map to support async operation
       field.sections.map(async (section) => {
-        // Load font
-        const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
         const page = pdfDoc.getPage(section.pageNumber - 1);
 
         let curX = section.boundingBox.xPosition + section.boundingBox.paddingX;
-        for (const char of field.fieldType.placeholder) {
+        for (const char of field.fieldType.placeholder.slice(
+          section.characterStart,
+          section.characterEnd
+        )) {
           page.drawText(char, {
             x: curX,
             y:

@@ -5,19 +5,30 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import { FC, useState } from "react";
-import { ISectionProps } from "../interfaces/document";
+import { ISectionStyleProps } from "../interfaces/document";
 import TwButton from "./TwButton";
+import { DEFAULT_SECTION_STYLE } from "../constant/sections";
+
+import SectionEditorForm from "./SectionEditorForm";
 
 type Props = {
   isOpen: boolean;
   handleClose: () => void;
-  onSave: (sections: ISectionProps[]) => void;
+  onSave: (sections: ISectionStyleProps[]) => void;
 };
 
 const SectionSelectorModal: FC<Props> = ({ handleClose, isOpen, onSave }) => {
-  const [sections, setSections] = useState<ISectionProps[]>([
-    { start: 0, end: 1 },
+  const [sections, setSections] = useState<ISectionStyleProps[]>([
+    DEFAULT_SECTION_STYLE,
   ]);
+
+  const handleSectionChange = (i: number, newSection: ISectionStyleProps) => {
+    setSections((prev) =>
+      prev.map((section, idx) => {
+        return idx === i ? newSection : section;
+      })
+    );
+  };
 
   return (
     <Dialog
@@ -35,61 +46,17 @@ const SectionSelectorModal: FC<Props> = ({ handleClose, isOpen, onSave }) => {
           </Description>
 
           {sections.map((section, i) => (
-            <div key={i}>
-              <h1 className="underline">Section {i + 1}</h1>
-              <div className="flex items-center gap-2">
-                <h2>Start char:</h2>
-                <input
-                  className="flex-1"
-                  type="number"
-                  min={0}
-                  step={1}
-                  value={section.start}
-                  onChange={(e) => {
-                    const value = e.target.value;
-
-                    setSections((prev) =>
-                      prev.map((section, idx) => {
-                        if (idx === i) {
-                          return { ...section, start: Number(value) };
-                        } else {
-                          return section;
-                        }
-                      })
-                    );
-                  }}
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <h2>End char:</h2>
-                <input
-                  className="flex-1"
-                  type="number"
-                  min={0}
-                  step={1}
-                  value={section.end}
-                  onChange={(e) => {
-                    const value = e.target.value;
-
-                    setSections((prev) =>
-                      prev.map((section, idx) => {
-                        if (idx === i) {
-                          return { ...section, end: Number(value) };
-                        } else {
-                          return section;
-                        }
-                      })
-                    );
-                  }}
-                />
-              </div>
-            </div>
+            <SectionEditorForm
+              key={i}
+              i={i}
+              section={section}
+              onSectionChange={handleSectionChange}
+            />
           ))}
 
           <TwButton
             onClick={() =>
-              setSections((prev) => [...prev, { start: 0, end: 1 }])
+              setSections((prev) => [...prev, DEFAULT_SECTION_STYLE])
             }
           >
             Add section
