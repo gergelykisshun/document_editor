@@ -1,10 +1,17 @@
 import { PDFDocument, rgb } from "pdf-lib";
 import { IFormFieldDTO } from "../interfaces/document";
 
-export const drawFieldsOnPdf = async (
-  formFields: IFormFieldDTO[],
-  fileUrl: string
-): Promise<string> => {
+type Props = {
+  formFields: IFormFieldDTO[];
+  fileUrl: string;
+  currentPage: number;
+};
+
+export const drawFieldsOnPdf = async ({
+  fileUrl,
+  formFields,
+  currentPage,
+}: Props): Promise<string> => {
   const url = fileUrl;
   const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer());
 
@@ -14,6 +21,8 @@ export const drawFieldsOnPdf = async (
     formFields.map(async (field) => {
       // Using map to support async operation
       field.sections.map(async (section) => {
+        if (currentPage !== section.pageNumber) return;
+
         const page = pdfDoc.getPage(section.pageNumber - 1);
         // Load font
         const font = await pdfDoc.embedFont(section.style.fontType);

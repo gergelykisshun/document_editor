@@ -21,6 +21,7 @@ import { drawFieldsOnPdf } from "./utils/drawFieldsOnPdf";
 function App() {
   const [mode, setMode] = useState<DrawMode>(DrawMode.IDLE);
   const [documentType] = useState<IDocumentType>(MOCK_DOCUMENT_SINGLE_PAGE);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   // This will be fetched and stored in the state var
   const originalFileUrl = "/test.pdf";
@@ -57,6 +58,8 @@ function App() {
     console.log(formField);
     console.log(section);
   };
+
+  const handlePageChange = (page: number) => setCurrentPage(page);
 
   const handleFormfieldChange = ({
     fieldIdx,
@@ -109,14 +112,18 @@ function App() {
 
   useEffect(() => {
     const getPdfWithFieldsDrawn = async () => {
-      const newPdfUrl = await drawFieldsOnPdf(formFields, originalFileUrl);
+      const newPdfUrl = await drawFieldsOnPdf({
+        formFields,
+        fileUrl: originalFileUrl,
+        currentPage,
+      });
       setFileUrl(newPdfUrl);
     };
 
     if (formFields.length > 0) {
       getPdfWithFieldsDrawn();
     }
-  }, [formFields]);
+  }, [formFields, currentPage]);
 
   return (
     <div className="px-4">
@@ -140,8 +147,10 @@ function App() {
 
         <div className="col-span-5">
           <PdfViewer
+            currentPage={currentPage}
             fileUrl={fileUrl}
             mode={mode}
+            formFields={formFields}
             saveDrawing={async (rect) => {
               if (sections.length === 0) return;
 
@@ -195,8 +204,8 @@ function App() {
                 return newSections;
               });
             }}
-            formFields={formFields}
             onRectSelected={handleRectSelect}
+            onPageChange={handlePageChange}
           />
         </div>
       </div>

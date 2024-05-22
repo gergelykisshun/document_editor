@@ -3,10 +3,6 @@ import * as pdfjs from "pdfjs-dist";
 import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
 import type { DocumentInitParameters } from "pdfjs-dist/types/src/display/api";
 
-function isFunction(value: any): value is Function {
-  return typeof value === "function";
-}
-
 type PDFRenderTask = ReturnType<PDFPageProxy["render"]>;
 
 type HookProps = {
@@ -53,12 +49,24 @@ export const usePdf = ({
   const [pdfPage, setPdfPage] = useState<PDFPageProxy>();
   const renderTask = useRef<PDFRenderTask | null>(null);
   const lastPageRequestedRenderRef = useRef<PDFPageProxy | null>(null);
-  const onDocumentLoadSuccessRef = useRef(onDocumentLoadSuccess);
-  const onDocumentLoadFailRef = useRef(onDocumentLoadFail);
-  const onPageLoadSuccessRef = useRef(onPageLoadSuccess);
-  const onPageLoadFailRef = useRef(onPageLoadFail);
-  const onPageRenderSuccessRef = useRef(onPageRenderSuccess);
-  const onPageRenderFailRef = useRef(onPageRenderFail);
+  const onDocumentLoadSuccessRef = useRef<
+    typeof onDocumentLoadSuccess | undefined
+  >(onDocumentLoadSuccess);
+  const onDocumentLoadFailRef = useRef<typeof onDocumentLoadFail | undefined>(
+    onDocumentLoadFail
+  );
+  const onPageLoadSuccessRef = useRef<typeof onPageLoadSuccess | undefined>(
+    onPageLoadSuccess
+  );
+  const onPageLoadFailRef = useRef<typeof onPageLoadFail | undefined>(
+    onPageLoadFail
+  );
+  const onPageRenderSuccessRef = useRef<typeof onPageRenderSuccess | undefined>(
+    onPageRenderSuccess
+  );
+  const onPageRenderFailRef = useRef<typeof onPageRenderFail | undefined>(
+    onPageRenderFail
+  );
 
   // Assign callbacks to refs to avoid redrawing
   useEffect(() => {
@@ -100,12 +108,12 @@ export const usePdf = ({
       (loadedPdfDocument) => {
         setPdfDocument(loadedPdfDocument);
 
-        if (isFunction(onDocumentLoadSuccessRef.current)) {
+        if (onDocumentLoadSuccessRef.current) {
           onDocumentLoadSuccessRef.current(loadedPdfDocument);
         }
       },
       () => {
-        if (isFunction(onDocumentLoadFailRef.current)) {
+        if (onDocumentLoadFailRef.current) {
           onDocumentLoadFailRef.current();
         }
       }
@@ -163,7 +171,7 @@ export const usePdf = ({
             mainCanvasContext.drawImage(secondaryCanvas, 0, 0);
           }
 
-          if (isFunction(onPageRenderSuccessRef.current)) {
+          if (onPageRenderSuccessRef.current) {
             onPageRenderSuccessRef.current(page);
           }
         },
@@ -175,7 +183,7 @@ export const usePdf = ({
               lastPageRequestedRenderRef.current ?? page;
             lastPageRequestedRenderRef.current = null;
             drawPDF(lastPageRequestedRender);
-          } else if (isFunction(onPageRenderFailRef.current)) {
+          } else if (onPageRenderFailRef.current) {
             onPageRenderFailRef.current();
           }
         }
@@ -187,14 +195,14 @@ export const usePdf = ({
         (loadedPdfPage) => {
           setPdfPage(loadedPdfPage);
 
-          if (isFunction(onPageLoadSuccessRef.current)) {
+          if (onPageLoadSuccessRef.current) {
             onPageLoadSuccessRef.current(loadedPdfPage);
           }
 
           drawPDF(loadedPdfPage);
         },
         () => {
-          if (isFunction(onPageLoadFailRef.current)) {
+          if (onPageLoadFailRef.current) {
             onPageLoadFailRef.current();
           }
         }

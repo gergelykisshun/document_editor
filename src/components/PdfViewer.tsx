@@ -11,19 +11,22 @@ import { usePdf } from "../hooks/usePdf";
 type Props = {
   fileUrl: string;
   mode: DrawMode;
+  currentPage: number;
+  onPageChange: (page: number) => void;
   saveDrawing: (rect: IRectangleDrawn) => void;
   formFields: IFormFieldDTO[];
   onRectSelected: (formField: IFormFieldDTO, section: IInputSection) => void;
 };
 
 const PdfViewer: FC<Props> = ({
+  currentPage,
   mode,
-  saveDrawing,
   formFields,
   fileUrl,
+  saveDrawing,
   onRectSelected,
+  onPageChange,
 }) => {
-  const [page, setPage] = useState(1);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const stageRef = useRef<StageType | null>(null);
 
@@ -67,7 +70,7 @@ const PdfViewer: FC<Props> = ({
   // Local pdf
   const { pdfDocument } = usePdf({
     file: fileUrl,
-    page,
+    page: currentPage,
     canvasRef,
     scale: 2,
     onPageRenderSuccess: () => updateCanvasSize(),
@@ -123,7 +126,7 @@ const PdfViewer: FC<Props> = ({
         paddingX: 3,
         paddingY: 3,
       },
-      page,
+      page: currentPage,
       pdfSize,
     });
     resetDrawing();
@@ -163,7 +166,7 @@ const PdfViewer: FC<Props> = ({
 
   useEffect(() => {
     const updatePdfSize = async () => {
-      const pageData = await pdfDocument?.getPage(page);
+      const pageData = await pdfDocument?.getPage(currentPage);
       const viewPort = pageData?.getViewport({ scale: 1 });
 
       if (viewPort) {
@@ -172,7 +175,7 @@ const PdfViewer: FC<Props> = ({
     };
 
     updatePdfSize();
-  }, [pdfDocument, page]);
+  }, [pdfDocument, currentPage]);
 
   return (
     <div>
@@ -198,7 +201,7 @@ const PdfViewer: FC<Props> = ({
                 {formFields.length > 0 &&
                   formFields.map((formField) =>
                     formField.sections.map((section, idx) => {
-                      if (section.pageNumber === page) {
+                      if (section.pageNumber === currentPage) {
                         return (
                           <Rect
                             key={idx}
@@ -227,13 +230,16 @@ const PdfViewer: FC<Props> = ({
 
       {Boolean(pdfDocument && pdfDocument.numPages) && (
         <div className="pager flex gap-2">
-          <TwButton disabled={page === 1} onClick={() => setPage(page - 1)}>
+          <TwButton
+            disabled={currentPage === 1}
+            onClick={() => onPageChange(currentPage - 1)}
+          >
             Previous
           </TwButton>
 
           <TwButton
-            disabled={page === pdfDocument?.numPages}
-            onClick={() => setPage(page + 1)}
+            disabled={currentPage === pdfDocument?.numPages}
+            onClick={() => onPageChange(currentPage + 1)}
           >
             Next
           </TwButton>
