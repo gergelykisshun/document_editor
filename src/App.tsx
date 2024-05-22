@@ -17,6 +17,7 @@ import FormFieldsEditor from "./components/FormFieldsEditor";
 import { DEFAULT_SECTION_STYLE } from "./constant/sections";
 import TwButton from "./components/TwButton";
 import { drawFieldsOnPdf } from "./utils/drawFieldsOnPdf";
+import { useDebounce } from "./hooks/useDebounce";
 
 function App() {
   const [mode, setMode] = useState<DrawMode>(DrawMode.IDLE);
@@ -34,6 +35,7 @@ function App() {
     useState<boolean>(false);
 
   const [formFields, setFormFields] = useState<IFormFieldDTO[]>([]);
+  const debouncedFormFields = useDebounce(formFields, 500);
 
   // Methods
   const startDrawingSections = (sections: ISectionStyleProps[]) => {
@@ -113,17 +115,17 @@ function App() {
   useEffect(() => {
     const getPdfWithFieldsDrawn = async () => {
       const newPdfUrl = await drawFieldsOnPdf({
-        formFields,
+        formFields: debouncedFormFields,
         fileUrl: originalFileUrl,
         currentPage,
       });
       setFileUrl(newPdfUrl);
     };
 
-    if (formFields.length > 0) {
+    if (debouncedFormFields.length > 0) {
       getPdfWithFieldsDrawn();
     }
-  }, [formFields, currentPage]);
+  }, [debouncedFormFields, currentPage]);
 
   return (
     <div className="px-4">
