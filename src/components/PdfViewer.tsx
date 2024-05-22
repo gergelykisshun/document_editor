@@ -1,4 +1,4 @@
-import { useState, useRef, FC, useEffect, useMemo } from "react";
+import { useState, useRef, FC, useEffect, useMemo, useCallback } from "react";
 import { Layer, Rect, Stage } from "react-konva";
 import { Stage as StageType } from "konva/lib/Stage";
 import { DEFAULT_CONTAINER_SIZE } from "../constant/drawingCanvas";
@@ -64,62 +64,14 @@ const PdfViewer: FC<Props> = ({
     [canvasSize, pdfSize]
   );
 
-  // From url
-  /*  const { pdfDocument } = usePdf({
-    file: "https://pdf-lib.js.org/assets/with_update_sections.pdf",
-    page,
-    canvasRef,
-    scale: 2,
-  }); */
-
   // Local pdf
   const { pdfDocument } = usePdf({
     file: fileUrl,
     page,
     canvasRef,
     scale: 2,
+    onPageRenderSuccess: () => updateCanvasSize(),
   });
-
-  useEffect(() => {
-    const updateCanvasSize = () => {
-      // Canvas container inital size only should be determined if we have the pdfDocument loaded
-      if (!pdfDocument) return;
-
-      if (canvasContainerRef.current) {
-        const containerRect =
-          canvasContainerRef.current.getBoundingClientRect();
-
-        setCanvasSize({
-          width: containerRect.width,
-          height: containerRect.height,
-        });
-      }
-    };
-
-    // Initial size update
-    updateCanvasSize();
-
-    // Listen for window resize events
-    window.addEventListener("resize", updateCanvasSize);
-
-    // Clean up event listener
-    return () => {
-      window.removeEventListener("resize", updateCanvasSize);
-    };
-  }, [pdfDocument]);
-
-  useEffect(() => {
-    const updatePdfSize = async () => {
-      const pageData = await pdfDocument?.getPage(page);
-      const viewPort = pageData?.getViewport({ scale: 1 });
-
-      if (viewPort) {
-        setPdfSize({ width: viewPort.width, height: viewPort.height });
-      }
-    };
-
-    updatePdfSize();
-  }, [pdfDocument, page]);
 
   // Methods
   const handleMouseDown = () => {
@@ -177,11 +129,50 @@ const PdfViewer: FC<Props> = ({
     resetDrawing();
   };
 
+  const updateCanvasSize = useCallback(() => {
+    if (!pdfDocument) return;
+
+    if (canvasContainerRef.current) {
+      const containerRect = canvasContainerRef.current.getBoundingClientRect();
+
+      setCanvasSize({
+        width: containerRect.width,
+        height: containerRect.height,
+      });
+    }
+  }, [pdfDocument]);
+
   useEffect(() => {
     if (mode === DrawMode.IDLE) {
       resetDrawing();
     }
   }, [mode]);
+
+  useEffect(() => {
+    // Initial size update
+    updateCanvasSize();
+
+    // Listen for window resize events
+    window.addEventListener("resize", updateCanvasSize);
+
+    // Clean up event listener
+    return () => {
+      window.removeEventListener("resize", updateCanvasSize);
+    };
+  }, [updateCanvasSize]);
+
+  useEffect(() => {
+    const updatePdfSize = async () => {
+      const pageData = await pdfDocument?.getPage(page);
+      const viewPort = pageData?.getViewport({ scale: 1 });
+
+      if (viewPort) {
+        setPdfSize({ width: viewPort.width, height: viewPort.height });
+      }
+    };
+
+    updatePdfSize();
+  }, [pdfDocument, page]);
 
   return (
     <div>

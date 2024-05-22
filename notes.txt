@@ -1,5 +1,3 @@
-- Avoid flickering when drawing values.
-  - Just draw on an empty pdf canvas the same size??
-  - Use react konva to draw?
-
-- Save bounding box position, text position
+- Avoid pdf flicker on edit
+- Add debounce to formFields
+- Draw pdf on the affected page only!

@@ -60,7 +60,7 @@ export const usePdf = ({
   const onPageRenderSuccessRef = useRef(onPageRenderSuccess);
   const onPageRenderFailRef = useRef(onPageRenderFail);
 
-  // assign callbacks to refs to avoid redrawing
+  // Assign callbacks to refs to avoid redrawing
   useEffect(() => {
     onDocumentLoadSuccessRef.current = onDocumentLoadSuccess;
   }, [onDocumentLoadSuccess]);
@@ -113,28 +113,32 @@ export const usePdf = ({
   }, [file, withCredentials, cMapUrl, cMapPacked]);
 
   useEffect(() => {
-    // draw a page of the pdf
+    // Draw a page of the PDF
     const drawPDF = (page: PDFPageProxy) => {
-      // Because this page's rotation option overwrites pdf default rotation value,
-      // calculating page rotation option value from pdf default and this component prop rotate.
+      // Calculate rotation
       const rotation = rotate === 0 ? page.rotate : page.rotate + rotate;
       const viewport = page.getViewport({ scale, rotation });
+
       const canvasEl = canvasRef!.current;
       if (!canvasEl) {
         return;
       }
 
-      const canvasContext = canvasEl.getContext("2d");
-      if (!canvasContext) {
+      const secondaryCanvas = document.createElement("canvas");
+      const secondaryCanvasCtx = secondaryCanvas.getContext("2d");
+      if (!secondaryCanvasCtx) {
         return;
       }
 
-      canvasEl.height = viewport.height * window.devicePixelRatio;
-      canvasEl.width = viewport.width * window.devicePixelRatio;
+      // Set off-screen canvas dimensions and scale
+      secondaryCanvas.height = viewport.height * window.devicePixelRatio;
+      secondaryCanvas.width = viewport.width * window.devicePixelRatio;
+      secondaryCanvasCtx.scale(
+        window.devicePixelRatio,
+        window.devicePixelRatio
+      );
 
-      canvasContext.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-      // if previous render isn't done yet, we cancel it
+      // Cancel previous render task if not done
       if (renderTask.current) {
         lastPageRequestedRenderRef.current = page;
         renderTask.current.cancel();
@@ -142,13 +146,22 @@ export const usePdf = ({
       }
 
       renderTask.current = page.render({
-        canvasContext,
+        canvasContext: secondaryCanvasCtx,
         viewport,
       });
 
       return renderTask.current.promise.then(
         () => {
           renderTask.current = null;
+
+          // Transfer off-screen canvas content to main canvas
+          const mainCanvasContext = canvasEl.getContext("2d");
+          if (mainCanvasContext) {
+            canvasEl.height = viewport.height * window.devicePixelRatio;
+            canvasEl.width = viewport.width * window.devicePixelRatio;
+            mainCanvasContext.clearRect(0, 0, canvasEl.width, canvasEl.height);
+            mainCanvasContext.drawImage(secondaryCanvas, 0, 0);
+          }
 
           if (isFunction(onPageRenderSuccessRef.current)) {
             onPageRenderSuccessRef.current(page);
